@@ -1,7 +1,7 @@
 import json
 import os
 
-PATH = "Library_Management/Library_Management_GUI/data/books.json"
+PATH = "Library_Management_GUI/data/books.json"
 
 def ReadBook():
     if not os.path.exists(PATH) or os.path.getsize(PATH) == 0:
