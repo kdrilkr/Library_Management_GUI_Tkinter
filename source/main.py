@@ -1,6 +1,5 @@
 #PACKAGES
 import tkinter as tk
-
 from tkinter import messagebox as msg
 import functions
 import os
@@ -95,6 +94,11 @@ def ShowBooks():
 
     frame.bind("<Configure>", on_frame_configure)
     # --- Bitti ---
+    def _on_mousewheel(event):
+    # Windows / Mac
+        canvas.yview_scroll(-1 * int(event.delta / 120), "units")
+
+    canvas.bind_all("<MouseWheel>", _on_mousewheel) 
 
     from functions import ReadBook, DecreaseStock
     cont_dict = ReadBook()
