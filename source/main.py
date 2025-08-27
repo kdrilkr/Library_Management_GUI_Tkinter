@@ -6,7 +6,7 @@ import functions
 import os
 import json
 #BOOK LIST PATH
-PATH = "Library_Management/Library_Management_GUI/data/books.json"
+PATH = "Library_Management_GUI/data/books.json"
 def only_int(input):
     return input.isdigit() or input == "" 
 root = tk.Tk()
