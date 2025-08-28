@@ -1,31 +1,42 @@
-#PACKAGES
+#packages
 import tkinter as tk
 from tkinter import messagebox as msg
 import functions
 import os
 import json
-#BOOK LIST PATH
+#book database path(json)
 PATH = "Library_Management_GUI/data/books.json"
 def only_int(input):
-    return input.isdigit() or input == "" 
+    return input.isdigit() or input == ""
+trcheckvalue = False
+def trcheck(inputtr):
+    if inputtr == "":
+        return True # unfamiliar chars are ğ, Ğ, ş, Ş respectively
+    if "ð" in inputtr or "Ð" in inputtr or "İ" in inputtr or\
+        "ü"in inputtr or "Ü"in inputtr or "ö"in inputtr or\
+        "Ö"in inputtr or "ç"in inputtr or "Ç" in inputtr or\
+        "þ" in inputtr or "Þ" in inputtr:
+        return trcheckvalue
+    return True
 root = tk.Tk()
 vcmd = (root.register(only_int), "%P")
+vcmdentry = (root.register(trcheck), "%P")
 root.geometry("300x240")
 root.title("LMS")
-#LABELS AND ENTRIES
+#labels and entries
 mainlabel = tk.Label(root, text="Library Management System")
 mainlabel.place(x=80, y=8,relx=0.22,anchor="center")
 
 BookNameLabel= tk.Label(root, text="Book Name:")
 BookNameLabel.place(x=40, y=30, relx=0.052,anchor="center")
 
-BookNameEntry = tk.Entry(root, bd=1.5)
+BookNameEntry = tk.Entry(root, bd=1.5, validate="key", validatecommand=vcmdentry)
 BookNameEntry.place(x=110,y=30, relx=0.15,anchor="center")
 
 AuthorLabel= tk.Label(root, text="Author: ")
 AuthorLabel.place(x=65, y=60, relx=0.013,anchor="center")
 
-AuthorEntry = tk.Entry(root, bd=1.5)
+AuthorEntry = tk.Entry(root, bd=1.5, validate="key", validatecommand=vcmdentry)
 AuthorEntry.place(x=110,y=60, relx=0.15,anchor="center")
 
 ISBNLabel= tk.Label(root, text="ISBN: ")
@@ -62,7 +73,7 @@ def NewBook():
     ISBNEntry.delete(0, tk.END)
 
 def ShowBooks():
-    # Eğer pencere zaten açıksa yeniden çiz
+    # if window is already open do it again
     if hasattr(ShowBooks, "window") and ShowBooks.window.winfo_exists():
         window = ShowBooks.window
         for widget in window.winfo_children():
@@ -71,9 +82,9 @@ def ShowBooks():
         window = tk.Toplevel()
         ShowBooks.window = window
         window.title("Book List")
-        window.geometry("775x600")
+        window.geometry("860x600")
 
-    # --- Scroll destekli yapı ---
+    # scrollable structure(canvas and container technique)
     container = tk.Frame(window)
     container.pack(fill="both", expand=True)
 
@@ -88,14 +99,12 @@ def ShowBooks():
     frame = tk.Frame(canvas)
     canvas.create_window((0, 0), window=frame, anchor="nw")
 
-    # Scroll ayarı: içerik büyüdükçe scrollbar aktif olsun
+    # scroll settings: while context is getting bigger let scrolling enable.
     def on_frame_configure(event):
         canvas.configure(scrollregion=canvas.bbox("all"))
 
     frame.bind("<Configure>", on_frame_configure)
-    # --- Bitti ---
     def _on_mousewheel(event):
-    # Windows / Mac
         canvas.yview_scroll(-1 * int(event.delta / 120), "units")
 
     canvas.bind_all("<MouseWheel>", _on_mousewheel) 
@@ -105,14 +114,14 @@ def ShowBooks():
 
     labels = ["BOOK'S NAME", "AUTHOR", "ISBN", "STOCK", "ACTIONS"]
     for i, mainlabels in enumerate(labels):
-        tk.Label(frame, text=mainlabels, font=("Times New Roman", 10, "bold"),borderwidth=1, relief="solid", width=20).grid(row=0, column=i, sticky="nsew")
+        tk.Label(frame, text=mainlabels, font=("Arial", 10, "bold"),borderwidth=1, relief="solid", width=20).grid(row=0, column=i, sticky="nsew")
 
     def shorten(text, max_len=20):
-        return text if len(text) <= max_len else text[:max_len-3] + "..."
+        return text if len(text) <= max_len else text[:max_len-3] 
 
     def delete_action(isbn):
         DecreaseStock(isbn)
-        ShowBooks()   # tabloyu yenile
+        ShowBooks()   # refresh the table
 
     for line, (isbn, book) in enumerate(cont_dict.items(), start=1):
         tk.Label(frame, text=shorten(book["NAME"], 20), borderwidth=1, relief="solid",width=20, padx=5, pady=5, anchor="w").grid(row=line, column=0, sticky="nsew")
@@ -120,15 +129,15 @@ def ShowBooks():
         tk.Label(frame, text=shorten(isbn, 15), borderwidth=1, relief="solid",width=20, padx=5, pady=5, anchor="w").grid(row=line, column=2, sticky="nsew")
         tk.Label(frame, text=book["STOCK"], borderwidth=1, relief="solid",width=20, padx=5, pady=5, anchor="center").grid(row=line, column=3, sticky="nsew")
 
-        tk.Button(frame, text="Sil", width=10, command=lambda i=isbn: delete_action(i))\
-            .grid(row=line, column=4, padx=5, pady=5)
-
-#ADD BOOK BUTTON / BOOK LIST BUTTON
+        tk.Button(frame, text="Sil", width=10, command=lambda i=isbn: delete_action(i)).grid(row=line, column=4, padx=5, pady=5)
+    window.resizable(False, False)
+#add book / list book button
 AddButton = tk.Button(root,command=NewBook, text="Add Book")
 AddButton.place(x=70,y=150, relx=0.08,anchor="center")
 BookListButton = tk.Button(root, command=ShowBooks, text="Book List")
 BookListButton.place(x=170,y=150, relx=0.08,anchor="center")
-#WARNING IN MAIN WINDOW
+
+#warning
 warninglabel = tk.Label(root, text="Warning: Please only use English charachters!")
 warninglabel.place(x=80, y=115,relx=0.22,anchor="center")
 
