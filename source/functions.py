@@ -21,28 +21,18 @@ def AddBook(new_book):
     isbn = new_book["ISBN"]
     
     if isbn in books:
-        # Mevcut kitabın stokunu 1 artır
+        # increase stock
         books[isbn]["STOCK"] += 1
     else:
-        # Yeni kitap ekle
+        # add new book
         books[isbn] = {
             "NAME": new_book["NAME"],
             "AUTHOR": new_book["AUTHOR"],
             "STOCK": new_book["STOCK"],
             "STATUS": new_book["STATUS"]
         }
-
     WriteBook(books)
-    return books[isbn]["STOCK"]  # stok değerini geri döndürebiliriz
-
-
-def DeleteBook(isbn):
-    books = ReadBook()
-    if isbn in books:
-        del books[isbn]
-        WriteBook(books)
-        return True
-    return False
+    return books[isbn]["STOCK"]
 
 def DecreaseStock(isbn):
     books = ReadBook()
@@ -50,7 +40,7 @@ def DecreaseStock(isbn):
         if books[isbn]["STOCK"] > 1:
             books[isbn]["STOCK"] -= 1
         else:
-            del books[isbn]  # stok 1 ise kitabı tamamen sil
+            del books[isbn]  # if stock is 1 delete book
         WriteBook(books)
         return True
     return False
